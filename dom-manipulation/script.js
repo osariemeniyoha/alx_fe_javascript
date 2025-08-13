@@ -230,3 +230,34 @@ function normalizeCategory(cat) {
     .toLowerCase()
     .replace(/\b\w/g, c => c.toUpperCase());
 }
+
+function exportToJsonFile() {
+    const jsonStr = JSON.stringify(quotes);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'quotes.json';
+    link.click();
+    URL.revokeObjectURL(url);
+}
+
+function importFromJsonFile(event) {
+    const fileReader = new FileReader();
+    fileReader.onload = function(e) {
+        try {
+            const importedQuotes = JSON.parse(e.target.result);
+            if (Array.isArray(importedQuotes)) {
+                quotes.push(...importedQuotes);
+                saveQuotes();
+                alert('Quotes imported successfully!');
+            } else {
+                alert('Invalid JSON format.');
+            }
+        } catch (error) {
+            alert('Error reading file: ' + error.message);
+        }
+    };
+    fileReader.readAsText(event.target.files[0]);
+}
+
