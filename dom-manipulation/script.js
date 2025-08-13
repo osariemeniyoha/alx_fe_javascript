@@ -261,3 +261,42 @@ function importFromJsonFile(event) {
     fileReader.readAsText(event.target.files[0]);
 }
 
+function populateCategories() {
+    let categoryFilter = document.getElementById("categoryFilter");
+    categoryFilter.innerHTML = '<option value="all">All Categories</option>';
+
+    let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    let categories = [...new Set(quotes.map(q => q.category))];
+
+    categories.forEach(category => {
+        let option = document.createElement("option");
+        option.value = category;
+        option.textContent = category;
+        categoryFilter.appendChild(option);
+    });
+
+    // Restore last selected category
+    let savedCategory = localStorage.getItem("selectedCategory");
+    if (savedCategory) {
+        categoryFilter.value = savedCategory;
+        filterQuote();
+    }
+}
+
+function filterQuote() {
+    let selectedCategory = document.getElementById("categoryFilter").value;
+    localStorage.setItem("selectedCategory", selectedCategory);
+
+    let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    let filteredQuotes = selectedCategory === "all"
+        ? quotes
+        : quotes.filter(q => q.category === selectedCategory);
+
+    displayQuotes(filteredQuotes);
+}
+
+
+window.onload = function() {
+    populateCategories();
+};
+

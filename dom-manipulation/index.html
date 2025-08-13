@@ -39,6 +39,11 @@
     <button id="clearStorageBtn" type="button" title="Clears saved quotes from Local Storage">Clear Saved Quotes</button>
   </div>
 
+  <select id="categoryFilter" onchange="filterQuote()">
+    <option value="all">All Categories</option>
+</select>
+
+
   
 <button onclick="exportToJsonFile()">Export Quotes</button>
 <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
