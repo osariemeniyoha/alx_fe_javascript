@@ -275,7 +275,7 @@ function populateCategories() {
         categoryFilter.appendChild(option);
     });
 
-    // Restore last selected category
+    
     let savedCategory = localStorage.getItem("selectedCategory");
     if (savedCategory) {
         categoryFilter.value = savedCategory;
@@ -300,3 +300,61 @@ window.onload = function() {
     populateCategories();
 };
 
+
+const API_URL = "https://jsonplaceholder.typicode.com/posts"; 
+
+
+async function fetchQuotesFromServer() {
+    try {
+        let response = await fetch(API_URL);
+        let data = await response.json();
+        return data.slice(0, 5).map(item => ({
+            text: item.title,
+            category: "General"
+        }));
+    } catch (error) {
+        console.error("Error fetching from server:", error);
+        return [];
+    }
+}
+
+
+async function postQuoteToServer(quote) {
+    try {
+        await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(quote)
+        });
+    } catch (error) {
+        console.error("Error posting to server:", error);
+    }
+}
+
+
+async function syncQuotes() {
+    const serverQuotes = await fetchQuotesFromServer();
+    let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    
+    let mergedQuotes = [...serverQuotes, ...localQuotes.filter(lq => 
+        !serverQuotes.some(sq => sq.text === lq.text)
+    )];
+
+    localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
+    renderQuotes(mergedQuotes);
+    showNotification("Quotes synced with server.");
+}
+
+
+setInterval(syncQuotes, 30000); 
+
+
+function showNotification(message) {
+    const notif = document.createElement("div");
+    notif.textContent = message;
+    notif.style.background = "yellow";
+    notif.style.padding = "10px";
+    document.body.prepend(notif);
+    setTimeout(() => notif.remove(), 3000);
+}
