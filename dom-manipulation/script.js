@@ -350,11 +350,10 @@ async function syncQuotes() {
 setInterval(syncQuotes, 30000); 
 
 
-function showNotification(message) {
-    const notif = document.createElement("div");
-    notif.textContent = message;
-    notif.style.background = "yellow";
-    notif.style.padding = "10px";
-    document.body.prepend(notif);
-    setTimeout(() => notif.remove(), 3000);
+function syncQuotes() {
+ 
+    fetchQuotesFromServer().then(serverQuotes => {
+        localStorage.setItem("quotes", JSON.stringify(serverQuotes));
+        showNotification("Quotes synced with server!");
+    });
 }
